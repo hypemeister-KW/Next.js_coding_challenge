@@ -18,26 +18,38 @@ export function TextDisplay({ expectedText, typedText }: Props) {
 
   return (
     <div
-      className="font-mono text-2xl leading-relaxed select-none text-center max-w-4xl mx-auto whitespace-pre-wrap"
+      className="font-mono text-2xl leading-relaxed select-none text-center max-w-4xl mx-auto"
       style={{ color: theme.text.untyped }}
     >
-      {visibleLines.map((lineChars, lineIndex) => (
-        <div key={lineIndex} className="flex flex-wrap items-baseline justify-center whitespace-pre-wrap">
-          {lineChars.map((char, charIndex) => (
-            <span key={`${lineIndex}-${charIndex}`}>
-              {lineIndex === cursorLine && charIndex === cursorOffset && (
-                <span
-                  className="inline-block w-3 h-7 align-middle -mb-1 animate-blink"
-                  style={{
-                    backgroundColor: theme.cursor,
-                    marginRight: '2px',
-                  }}
-                />
-              )}
-              {char}
-            </span>
-          ))}
-          {lineIndex === cursorLine && cursorOffset === lineChars.length && (
+      {visibleLines.map((line, lineIndex) => (
+        <div key={lineIndex} className="flex flex-wrap items-baseline justify-center">
+          {line.words.map((wordChars, wordIndex) => {
+            const lineStartCharIdx = line.words
+              .slice(0, wordIndex)
+              .reduce((sum, w) => sum + w.length, 0)
+            return (
+              <span key={wordIndex} className="whitespace-nowrap inline-flex">
+                {wordChars.map((char, charIndex) => {
+                  const charIdx = lineStartCharIdx + charIndex
+                  return (
+                    <span key={`${lineIndex}-${wordIndex}-${charIndex}`}>
+                      {lineIndex === cursorLine && charIdx === cursorOffset && (
+                        <span
+                          className="inline-block w-3 h-7 align-middle -mb-1 animate-blink"
+                          style={{
+                            backgroundColor: theme.cursor,
+                            marginRight: '2px',
+                          }}
+                        />
+                      )}
+                      {char}
+                    </span>
+                  )
+                })}
+              </span>
+            )
+          })}
+          {cursorLine === lineIndex && cursorOffset === line.flatChars.length && (
             <span
               className="inline-block w-3 h-7 align-middle -mb-1 ml-0.5 animate-blink"
               style={{ backgroundColor: theme.cursor }}
@@ -49,7 +61,9 @@ export function TextDisplay({ expectedText, typedText }: Props) {
   )
 }
 
-function buildLines(expectedText: string, typedText: string): React.ReactNode[][] {
+type Line = { words: React.ReactNode[][]; flatChars: React.ReactNode[] }
+
+function buildLines(expectedText: string, typedText: string): Line[] {
   const chars: React.ReactNode[] = []
   for (let i = 0; i < expectedText.length; i++) {
     const expectedChar = expectedText[i]
@@ -80,37 +94,50 @@ function buildLines(expectedText: string, typedText: string): React.ReactNode[][
     }
   }
 
-  const lines: React.ReactNode[][] = []
-  let currentLine: React.ReactNode[] = []
+  const lines: Line[] = []
+  let currentWords: React.ReactNode[][] = []
+  let currentWord: React.ReactNode[] = []
   let wordCount = 0
 
   for (let i = 0; i < expectedText.length; i++) {
-    currentLine.push(chars[i])
+    currentWord.push(chars[i])
     if (expectedText[i] === ' ') {
+      currentWords.push(currentWord)
+      currentWord = []
       wordCount++
       if (wordCount >= WORDS_PER_LINE) {
-        lines.push(currentLine)
-        currentLine = []
+        lines.push({
+          words: currentWords,
+          flatChars: currentWords.flat(),
+        })
+        currentWords = []
         wordCount = 0
       }
     }
   }
-  if (currentLine.length > 0) lines.push(currentLine)
+  if (currentWord.length > 0) currentWords.push(currentWord)
+  if (currentWords.length > 0) {
+    lines.push({
+      words: currentWords,
+      flatChars: currentWords.flat(),
+    })
+  }
 
   return lines
 }
 
 function getCursorPosition(
-  lines: React.ReactNode[][],
+  lines: Line[],
   cursorPosition: number
 ): { lineIdx: number; offset: number } {
   let charCount = 0
   for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
-    const lineLength = lines[lineIdx].length
+    const lineLength = lines[lineIdx].flatChars.length
     if (charCount + lineLength >= cursorPosition) {
       return { lineIdx, offset: cursorPosition - charCount }
     }
     charCount += lineLength
   }
-  return { lineIdx: lines.length - 1, offset: lines[lines.length - 1]?.length ?? 0 }
+  const lastLine = lines[lines.length - 1]
+  return { lineIdx: lines.length - 1, offset: lastLine?.flatChars.length ?? 0 }
 }
