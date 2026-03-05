@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getWords, INITIAL_WORDS } from '@/lib/words'
 
-export function useTypingTest() {
+type UseTypingTestOptions = {
+  onRestart?: () => void
+}
+
+export function useTypingTest(options?: UseTypingTestOptions) {
+  const { onRestart } = options ?? {}
   const [words, setWords] = useState<string[]>(INITIAL_WORDS)
   const [typedText, setTypedText] = useState('')
   const [startTime, setStartTime] = useState<number | null>(null)
@@ -27,6 +32,21 @@ export function useTypingTest() {
     return Math.round((correct / typedText.length) * 1000) / 10
   }, [typedText, expectedText])
 
+  const typedChars = typedText.length
+
+  const correctChars = useMemo(() => {
+    let correct = 0
+    for (let i = 0; i < typedText.length; i++) {
+      if (typedText[i] === expectedText[i]) correct++
+    }
+    return correct
+  }, [typedText, expectedText])
+
+  const progress = useMemo(() => {
+    if (expectedText.length === 0) return 0
+    return Math.round((typedText.length / expectedText.length) * 100)
+  }, [typedText.length, expectedText.length])
+
   useEffect(() => {
     setWords(getWords(45))
   }, [])
@@ -36,7 +56,8 @@ export function useTypingTest() {
     setTypedText('')
     setStartTime(null)
     inputRef.current?.focus()
-  }, [])
+    onRestart?.()
+  }, [onRestart])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -81,5 +102,8 @@ export function useTypingTest() {
     handleInput,
     wpm,
     accuracy,
+    progress,
+    correctChars,
+    typedChars,
   }
 }

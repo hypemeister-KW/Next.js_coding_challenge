@@ -1,10 +1,13 @@
 'use client'
 
+import { useState, useCallback } from 'react'
 import { useTypingTest } from '../hooks/useTypingTest'
-import { TextDisplay, TypingInput } from '../components/typing'
+import { TextDisplay, TypingInput, StatsPanel } from '../components/typing'
 import { theme } from '../lib/theme'
 
 export default function Home() {
+  const [isStarted, setIsStarted] = useState(false)
+  const handleRestart = useCallback(() => setIsStarted(false), [])
   const {
     typedText,
     expectedText,
@@ -14,18 +17,59 @@ export default function Home() {
     restart,
     wpm,
     accuracy,
-  } = useTypingTest()
+    progress,
+    correctChars,
+    typedChars,
+  } = useTypingTest({ onRestart: handleRestart })
+
+  const handleRestartClick = useCallback(() => {
+    restart()
+    handleRestart()
+  }, [restart, handleRestart])
 
   return (
     <main
       className="min-h-screen flex flex-col items-center px-4"
       style={{ backgroundColor: theme.bg.main }}
     >
+      <div className="w-full max-w-4xl pt-6">
+        <StatsPanel
+          progress={progress}
+          correctChars={correctChars}
+          typedChars={typedChars}
+          wpm={wpm}
+          accuracy={accuracy}
+        />
+      </div>
       <div className="flex-1 w-full max-w-4xl flex flex-col items-center justify-center">
         <div className="relative w-full min-h-[140px] flex items-center justify-center">
-          <div className="w-full max-w-4xl">
+          <div
+            className={`w-full max-w-4xl transition-[filter] duration-300 ${!isStarted ? 'blur-md select-none' : ''}`}
+          >
             <TextDisplay expectedText={expectedText} typedText={typedText} />
           </div>
+          {!isStarted && (
+            <div
+              className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer"
+              onClick={() => {
+                setIsStarted(true)
+                inputRef.current?.focus()
+              }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  setIsStarted(true)
+                  inputRef.current?.focus()
+                }
+              }}
+            >
+              <p className="font-mono text-2xl text-white">
+                click to start a game
+              </p>
+            </div>
+          )}
           <TypingInput
             value={typedText}
             inputRef={inputRef}
@@ -37,12 +81,9 @@ export default function Home() {
 
       <div className="w-full max-w-4xl flex items-center justify-center py-6 border-t" style={{ borderColor: theme.border.default }}>
         <div className="flex items-center gap-6 font-mono text-sm" style={{ color: theme.text.muted }}>
-          <span>{wpm} wpm</span>
-          <span>{accuracy}%</span>
-          <span className="mx-2">|</span>
           <button
             type="button"
-            onClick={restart}
+            onClick={handleRestartClick}
             className="hover:opacity-80"
           >
             Restart
