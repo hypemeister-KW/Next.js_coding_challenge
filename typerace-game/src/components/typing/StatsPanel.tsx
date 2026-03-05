@@ -8,6 +8,7 @@ type Props = {
   typedChars: number
   wpm: number
   accuracy: number
+  savedStats?: { wpm: number; accuracy: number } | null
 }
 
 const StatItem = ({
@@ -36,6 +37,7 @@ export function StatsPanel({
   typedChars,
   wpm,
   accuracy,
+  savedStats,
 }: Props) {
   return (
     <div className="w-full">
@@ -52,6 +54,15 @@ export function StatsPanel({
         />
         <StatItem label="wpm" value={wpm} />
         <StatItem label="accuracy" value={`${accuracy}%`} />
+        {savedStats && (
+          <>
+            <span
+              className="w-px h-4 mx-1"
+              style={{ backgroundColor: theme.border.default }}
+            />
+            <StatItem label="last round" value={`${savedStats.wpm} wpm · ${savedStats.accuracy.toFixed(1)}%`} />
+          </>
+        )}
       </div>
       <div
         className="w-full h-px"

@@ -1,0 +1,7 @@
+{
+  "name": "typerace-game",
+  "main": "party/index.ts",
+  "parties": {
+    "competition": "party/index.ts"
+  }
+}

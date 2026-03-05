@@ -4,7 +4,7 @@ export const theme = {
     muted: '#16161e',
   },
   text: {
-    correct: '#c0caf5',
+    correct: '#ffffff',
     incorrect: '#f7768e',
     untyped: '#565f89',
     muted: '#414868',

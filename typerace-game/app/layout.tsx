@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'MonkeyType Game',
+  title: 'typerace-game',
   description: 'A typing speed game',
 }
 

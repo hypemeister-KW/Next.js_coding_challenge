@@ -1,9 +1,7 @@
 'use client'
 
 import { theme } from '../../lib/theme'
-
-const WORDS_PER_LINE = 12
-const VISIBLE_LINES = 3
+import { WORDS_PER_LINE, VISIBLE_LINES } from '../../lib/typingConfig'
 
 type Props = {
   expectedText: string

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getWords, INITIAL_WORDS } from '@/lib/words'
+import { TOTAL_WORDS } from '@/lib/typingConfig'
 
 type UseTypingTestOptions = {
   onRestart?: () => void
@@ -48,11 +49,11 @@ export function useTypingTest(options?: UseTypingTestOptions) {
   }, [typedText.length, expectedText.length])
 
   useEffect(() => {
-    setWords(getWords(45))
+    setWords(getWords(TOTAL_WORDS))
   }, [])
 
   const restart = useCallback(() => {
-    setWords(getWords(45))
+    setWords(getWords(TOTAL_WORDS))
     setTypedText('')
     setStartTime(null)
     inputRef.current?.focus()
