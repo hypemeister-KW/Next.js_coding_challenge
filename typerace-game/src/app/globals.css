@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@keyframes blink {
+
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+:root {
+  --foreground-rgb: 192, 202, 245;
+  --background-rgb: 26, 27, 38;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+}
