@@ -2,6 +2,37 @@
 
 A real-time typing competition platform where players join a shared room, type the same sentence, and compete on words-per-minute (WPM) and accuracy. Built with Next.js 16, PartyKit (WebSockets), and TypeScript.
 
+## How to Run
+
+### Prerequisites
+
+- Node.js 18+
+- npm
+
+### Development
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Copy env example (optional; defaults work for local dev):
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+3. Run both Next.js and PartyKit:
+
+   ```bash
+   npm run dev        # Next.js on http://localhost:3000
+   npm run dev:party   # PartyKit on http://localhost:1999
+   ```
+
+4. Open [http://localhost:3000]
+
+
 ## Features
 
 - **Real-time competition** – Join a lobby and see live progress of all players
@@ -74,41 +105,6 @@ A real-time typing competition platform where players join a shared room, type t
 - No sensitive data in WebSocket messages
 - PartyKit storage is scoped per room
 
-## How to Run
-
-### Prerequisites
-
-- Node.js 18+
-- npm
-
-### Development
-
-1. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-2. Copy env example (optional; defaults work for local dev):
-
-   ```bash
-   cp .env.example .env.local
-   ```
-
-3. Run both Next.js and PartyKit:
-
-   ```bash
-   npm run dev:all
-   ```
-
-   Or run separately:
-
-   ```bash
-   npm run dev        # Next.js on http://localhost:3000
-   npm run dev:party   # PartyKit on http://localhost:1999
-   ```
-
-4. Open [http://localhost:3000]
 
 ### Production Build
 
